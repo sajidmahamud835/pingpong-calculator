@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleek Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base styles to remove tap highlight on mobile for a cleaner interaction */
+        @layer base {
+            html {
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+
+        /* Fallback background color in case backdrop-filter is not supported */
+        body {
+            background-color: #1A1A2E; /* Matches dark-bg-start for consistency */
+        }
+
+        /* Glassmorphism effect for the calculator container */
+        .calculator-grid {
+            /* Tailwind `bg-calc-body` defines the RGBA color */
+            backdrop-filter: blur(16px); /* Apply blur to elements behind */
+            -webkit-backdrop-filter: blur(16px); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle white border for definition */
+            position: relative; /* Needed for pseudo-elements or specific layering if desired */
+            z-index: 1; /* Ensure it layers correctly */
+        }
+
+        /* Subtle glowing effect for the equals button on hover for "wow" factor */
+        .glow-on-hover:hover {
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.6), 0 0 30px rgba(0, 188, 212, 0.4);
+        }
+        .glow-on-hover:active {
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.8), 0 0 40px rgba(0, 188, 212, 0.6);
+        }
+    </style>
+    <script>
+        // Tailwind Configuration Extension
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-bg-start': '#1A1A2E', // Deep Space Blue
+                        'dark-bg-end': '#16213E',   // Darker Space Blue
+                        'calc-body': 'rgba(25, 25, 40, 0.7)', // Slightly transparent dark blue for glassmorphism
+                        'btn-default': 'rgba(255, 255, 255, 0.08)', // Transparent white for default buttons
+                        'btn-hover': 'rgba(255, 255, 255, 0.15)',   // Slightly more opaque on hover
+                        'btn-active': 'rgba(255, 255, 255, 0.25)',  // Even more opaque on active
+                        'accent-teal': '#00BCD4', // Vibrant Cyan/Teal for accent actions
+                        'accent-teal-hover': '#00ACC1', // Slightly darker teal on hover
+                        'accent-teal-active': '#0097A7',// Even darker on active
+                        'display-bg': 'rgba(0, 0, 0, 0.8)', // Dark, slightly transparent background for display
+                        'display-prev': '#B0BEC5', // Light blue-gray for previous operand
+                        'display-curr': '#ECEFF1', // Off-white for current operand
+                    },
+                    fontFamily: {
+                        // Using a modern system font stack due to external font link restrictions
+                        // Provides a clean, sans-serif look without external requests.
+                        sans: ['"Segoe UI"', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        // Custom shadow for a more pronounced "floating" effect
+                        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-dark-bg-start to-dark-bg-end min-h-screen flex justify-center items-center font-sans text-white p-4 overflow-hidden">
+
+    <div class="calculator-grid w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto rounded-3xl shadow-3xl p-4 grid grid-cols-4 gap-3">
+        <!-- Display Area -->
+        <div class="output col-span-4 bg-display-bg rounded-2xl p-5 text-right flex flex-col justify-around overflow-hidden min-h-[120px] mb-3 shadow-inner">
+            <div data-previous-operand class="previous-operand text-display-prev text-xl md:text-2xl break-words whitespace-pre-wrap transition-opacity duration-200 ease-in-out opacity-75"></div>
+            <div data-current-operand class="current-operand text-display-curr text-4xl md:text-5xl font-bold break-words whitespace-pre-wrap transition-opacity duration-200 ease-in-out">0</div>
+        </div>
+
+        <!-- Calculator Buttons Grid -->
+        <button data-all-clear class="col-span-2 bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">AC</button>
+        <button data-delete class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">DEL</button>
+        <button data-operator class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">/</button>
+
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">7</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">8</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">9</button>
+        <button data-operator class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">*</button>
+
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">4</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">5</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">6</button>
+        <button data-operator class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">-</button>
+
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">1</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">2</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">3</button>
+        <button data-operator class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">+</button>
+
+        <button data-number class="col-span-2 bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">0</button>
+        <button data-number class="bg-btn-default hover:bg-btn-hover active:bg-btn-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-hover">.</button>
+        <button data-equals class="bg-accent-teal hover:bg-accent-teal-hover active:bg-accent-teal-active text-lg md:text-xl p-4 rounded-xl transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-teal glow-on-hover">=</button>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor(previousOperandTextElement, currentOperandTextElement, pingPongSound) {
+                this.previousOperandTextElement = previousOperandTextElement;
+                this.currentOperandTextElement = currentOperandTextElement;
+                this.pingPongSound = pingPongSound;
+                this.clear();
+            }
+
+            playSound() {
+                if (this.pingPongSound) {
+                    this.pingPongSound.currentTime = 0; // Reset sound to start
+                    const playPromise = this.pingPongSound.play();
+                    // Catch potential errors from autoplay policy (browsers may block without user interaction)
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.warn("Audio autoplay prevented. User interaction required. Error:", error);
+                        });
+                    }
+                }
+            }
+
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.updateDisplay();
+                this.playSound();
+            }
+
+            delete() {
+                if (this.currentOperand === '0' && this.previousOperand === '') return; // Don't delete if nothing to delete
+                
+                this.currentOperand = this.currentOperand.toString().slice(0, -1);
+                if (this.currentOperand === '') {
+                    this.currentOperand = '0';
+                }
+                this.updateDisplay();
+                this.playSound();
+            }
+
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return; // Only one decimal point
+                if (this.currentOperand === '0' && number !== '.') {
+                    this.currentOperand = number.toString(); // Replace initial '0'
+                } else {
+                    this.currentOperand = this.currentOperand.toString() + number.toString();
+                }
+                this.updateDisplay();
+                this.playSound();
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === '0' && this.previousOperand === '') return; // No operation if empty
+                if (this.previousOperand !== '') {
+                    this.compute(); // Compute if an operation is already pending
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '0'; // Reset current operand for next input
+                this.updateDisplay();
+                this.playSound();
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return; // Cannot compute if operands are not numbers
+                
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '*':
+                        computation = prev * current;
+                        break;
+                    case '/':
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                this.currentOperand = computation.toString();
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.updateDisplay();
+                this.playSound();
+            }
+
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 });
+                }
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            updateDisplay() {
+                this.currentOperandTextElement.innerText = this.getDisplayNumber(this.currentOperand);
+                if (this.operation != null && this.previousOperand !== '') {
+                    this.previousOperandTextElement.innerText = `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandTextElement.innerText = '';
+                }
+            }
+        }
+
+        // Get references to all calculator elements
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operatorButtons = document.querySelectorAll('[data-operator]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const deleteButton = document.querySelector('[data-delete]');
+        const allClearButton = document.querySelector('[data-all-clear]');
+        const previousOperandTextElement = document.querySelector('[data-previous-operand]');
+        const currentOperandTextElement = document.querySelector('[data-current-operand]');
+
+        // Sound Integration: Using the provided URL for the ping pong sound effect.
+        const pingPongSound = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+
+        // Initialize the calculator
+        const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement, pingPongSound);
+
+        // Event Listeners for buttons
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.appendNumber(button.innerText);
+            });
+        });
+
+        operatorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.chooseOperation(button.innerText);
+            });
+        });
+
+        equalsButton.addEventListener('click', () => {
+            calculator.compute();
+        });
+
+        allClearButton.addEventListener('click', () => {
+            calculator.clear();
+        });
+
+        deleteButton.addEventListener('click', () => {
+            calculator.delete();
+        });
+
+        // Keyboard Support for enhanced usability
+        document.addEventListener('keydown', e => {
+            // Numbers and Decimal
+            if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
+                calculator.appendNumber(e.key);
+            }
+            // Equals/Enter
+            if (e.key === 'Enter' || e.key === '=') {
+                e.preventDefault(); // Prevent default browser actions like form submission
+                calculator.compute();
+            }
+            // Backspace (Delete last character)
+            if (e.key === 'Backspace') {
+                calculator.delete();
+            }
+            // Escape or Delete (Clear all)
+            if (e.key === 'Escape' || e.key === 'Delete') {
+                calculator.clear();
+            }
+            // Operators
+            if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+                calculator.chooseOperation(e.key);
+            }
+        });
+    </script>
+</body>
+</html>
