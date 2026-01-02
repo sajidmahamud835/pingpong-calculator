@@ -1,6 +1,13 @@
 # 🏓 PingPong Calculator
 
+[![Live Demo](https://img.shields.io/badge/Demo-Live-brightgreen?style=for-the-badge)](https://sajidmahamud835.github.io/pingpong-calculator/)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
 A sleek, modern calculator with satisfying ping-pong sound effects on every button press.
+
+**🔗 [Live Demo](https://sajidmahamud835.github.io/pingpong-calculator/)**
 
 ## ✨ Features
 
