@@ -254,4 +254,16 @@ MIT License
 
 ---
 
+## 🔗 Related Projects
+
+- **[Shopping Cost Calculator](../shopping-cost-calculator-js)** - Dynamic DOM manipulation utility for shopping lists.
+- **[EasyCom](../easycom)** - Full-stack Next.js e-commerce platform with modern UI.
+- **[Aamago Web](../aamago-nextjs-web)** - Consumer-facing e-commerce web application.
+
+## 🏷️ Tags
+
+`JavaScript` `Calculator` `Neumorphism` `Glassmorphism` `Tailwind CSS` `Sound Effects` `Interactive UI`
+
+---
+
 **Author:** [Muhammad Sajid Mahamud](https://github.com/sajidmahamud835)
